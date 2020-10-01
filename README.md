@@ -51,17 +51,20 @@ interface TextChangedListener {
 }
 
 class PrintingTextChangedListener : TextChangedListener {
-
-    override fun onTextChanged(oldText: String, newText: String) =
-        println("Text is changed $oldText -> $newText")
+    
+    private var text = ""
+    
+    override fun onTextChanged(oldText: String, newText: String) {
+        text = "Text is changed: $oldText -> $newText"
+    }
 }
 
 class TextView {
 
-    var listener: TextChangedListener? = null
+    val listeners = mutableListOf<TextChangedListener>()
 
     var text: String by Delegates.observable("<empty>") { _, old, new ->
-        listener?.onTextChanged(old, new)
+        listeners.forEach { it.onTextChanged(old, new) }
     }
 }
 ```
@@ -550,7 +553,7 @@ An external class controls the construction algorithm.
 // Let's assume that Dialog class is provided by external library.
 // We have only access to Dialog public interface which cannot be changed.
 
-class Dialog() {
+class Dialog {
 
     fun showTitle() = println("showing title")
 
@@ -1052,11 +1055,11 @@ open class Composite(name: String) : Equipment(0, name) {
     val equipments = ArrayList<Equipment>()
 
     fun add(equipment: Equipment) {
-        this.equipments.add(equipment);
+        this.equipments.add(equipment)
     }
 
     override fun getPrice(): Int {
-        return equipments.map { it -> it.getPrice() }.sum()
+        return equipments.map { it.getPrice() }.sum()
     }
 }
 
